@@ -47,4 +47,10 @@ pipeline {
             }
         }
     }
+ post {
+        always {
+            echo 'slack Notification.'
+            slackSend channel: '#devops-ci-cd-project', message: 'Build success'
+        }
+    }
 }

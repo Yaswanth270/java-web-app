@@ -1,5 +1,5 @@
 FROM maven as build
-WORKDIR /java-ap
+WORKDIR /java-app
 RUN git clone https://github.com/Yaswanth270/java-web-app.git /java-app
 RUN mvn clean install
 

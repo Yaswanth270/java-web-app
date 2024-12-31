@@ -37,13 +37,13 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t java-image .'
+                sh 'docker build -t java-image-latest .'
             }
         }
 
         stage('Run Docker Container') {
             steps {
-                sh 'docker run -itd --name java-cont -p 8081:8080 java-image'
+                sh 'docker run -itd --name java-container -p 8082:8080 java-image-latest'
             }
         }
     }

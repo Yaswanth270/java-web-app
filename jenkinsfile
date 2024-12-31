@@ -1,45 +1,50 @@
 pipeline {
-agent any
-environments{
-scanner_home= tool 'sonarqube-server'
-}
-stages {
-  stage('checkout')
-   steps {
-git branch: 'main', url:'https://github.com/Yaswanth270/java-web-app.git'
-}
-}
-stage('compile') {
-            steps {
-              sh 'mvn compile'
-            }
-        }
-        }
-stage('code analysis') {
-            steps {
-              withSonarQubeEnv('sonarqube-scanner') {
-               sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=java-web-app \
-               -Dsonar.java.binaries=. \
-               -Dsonar.projectKey=java-web-app'''
-              }
-            }
+    agent any
 
-stage('build') {
-steps {
-       sh 'mvn  install'
-}
-}
-stage('image') {
-steps {
-       sh 'docker build -t java-image .'
-}
-}
-
-stage('container') {
-steps {
-       sh 'docker run -itd --name java-cont -p 8081:8080 java-image'
+    environment {
+        scanner_home = tool 'sonarqube-server'
     }
-   }
-  }
-}
 
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Yaswanth270/java-web-app.git'
+            }
+        }
+
+        stage('Compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+
+        stage('Code Analysis') {
+            steps {
+                withSonarQubeEnv('sonarqube-scanner') {
+                    sh '''$SCANNER_HOME/bin/sonar-scanner \
+                    -Dsonar.projectName=java-web-app \
+                    -Dsonar.java.binaries=. \
+                    -Dsonar.projectKey=java-web-app'''
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn install'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t java-image .'
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                sh 'docker run -itd --name java-cont -p 8081:8080 java-image'
+            }
+        }
+    }
+}

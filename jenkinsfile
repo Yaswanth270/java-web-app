@@ -1,0 +1,45 @@
+pipeline {
+agent any
+environments{
+scanner_home= tool 'sonar-server'
+}
+stages {
+  stage('checkout')
+   steps {
+git branch: 'main', url:'https://github.com/Yaswanth270/java-web-app.git'
+}
+}
+stage('compile') {
+            steps {
+              sh 'mvn compile'
+            }
+        }
+        }
+stage('code analysis') {
+            steps {
+              withSonarQubeEnv('sonarqube') {
+               sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=java-web-app \
+               -Dsonar.java.binaries=. \
+               -Dsonar.projectKey=java-web-app'''
+              }
+            }
+
+stage('build') {
+steps {
+       sh 'mvn  install'
+}
+}
+stage('image') {
+steps {
+       sh 'docker build -t java-image .'
+}
+}
+
+stage('container') {
+steps {
+       sh 'docker run -itd --name java-cont -p 8081:8080 java-image'
+    }
+   }
+  }
+}
+

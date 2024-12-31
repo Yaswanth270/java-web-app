@@ -1,7 +1,7 @@
 pipeline {
 agent any
 environments{
-scanner_home= tool 'sonar-server'
+scanner_home= tool 'sonarqube-server'
 }
 stages {
   stage('checkout')
@@ -17,7 +17,7 @@ stage('compile') {
         }
 stage('code analysis') {
             steps {
-              withSonarQubeEnv('sonarqube') {
+              withSonarQubeEnv('sonarqube-scanner') {
                sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=java-web-app \
                -Dsonar.java.binaries=. \
                -Dsonar.projectKey=java-web-app'''

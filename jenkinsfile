@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -27,6 +28,13 @@ pipeline {
                         -Dsonar.projectKey=java-web-app'''
                 }
             }
+        }
+ stage('docker-stage-clear') {
+          steps {
+              sh 'docker stop $(docker ps -q) || true'
+              sh 'docker rm $(docker ps -aq) || true'
+              sh 'docker rmi $(docker images -q) || true'
+           }
         }
 
         stage('Build') {

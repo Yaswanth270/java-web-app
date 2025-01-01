@@ -1,4 +1,4 @@
-FROM maven as build
+FROM maven AS build
 WORKDIR /java-app
 RUN git clone https://github.com/Yaswanth270/java-web-app.git /java-app
 RUN mvn clean install

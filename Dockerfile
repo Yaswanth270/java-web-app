@@ -1,7 +1,8 @@
 FROM maven AS build
 WORKDIR /java-app
-RUN git clone https://github.com/Yaswanth270/java-web-app.git . && \ 
+RUN git clone https://github.com/Yaswanth270/java-web-app.git . && \
     mvn clean install
+
 
 FROM openjdk:17-jdk
 WORKDIR /app

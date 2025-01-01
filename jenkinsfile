@@ -22,10 +22,18 @@ pipeline {
             steps {
                 withSonarQubeEnv('sonarqube-server') {
                     sh '''$SCANNER_HOME/bin/sonar-scanner \
-                    -Dsonar.projectName=java-web-app \
-                    -Dsonar.java.binaries=. \
-                    -Dsonar.projectKey=java-web-app'''
+                        -Dsonar.projectName=java-web-app \
+                        -Dsonar.java.binaries=. \
+                        -Dsonar.projectKey=java-web-app'''
                 }
+            }
+        }
+
+        stage('Docker Stage Cleanup') {
+            steps {
+                sh 'docker stop $(docker ps -q)'
+                sh  'docker rm $(docker ps -aq)'
+                  sh 'docker rmi $(docker images -q)'
             }
         }
 
@@ -47,10 +55,16 @@ pipeline {
             }
         }
     }
- post {
-        always {
-            echo 'slack Notification.'
-            slackSend channel: '#devops-ci-cd-project', message: 'Build success'
+
+    post {
+        success {
+            echo 'Slack Notification: Build Success'
+            slackSend channel: '#devops-ci-cd-project', message: 'Build success', color: 'good'
+        }
+        failure {
+            echo 'Slack Notification: Build Failure'
+            slackSend channel: '#devops-ci-cd-project', message: 'Build failed', color: 'danger'
         }
     }
 }
+

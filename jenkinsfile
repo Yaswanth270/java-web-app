@@ -1,10 +1,18 @@
 
 pipeline {
     agent any
-
-    environment {
-        SCANNER_HOME = tool 'sonarqube-scanner'
+    tools {
+        maven 'maven3'
     }
+    triggers {
+        // polls the scm every5 mins
+        pollSCM ('5 * * * *')
+        //builds the piepline periodcally every day 3 clock
+        cron ('0 15 * * *')
+    }
+   // environment {
+     //   SCANNER_HOME = tool 'sonarqube-scanner'
+    //}
 
     stages {
         stage('Checkout') {
@@ -19,23 +27,23 @@ pipeline {
             }
         }
 
-        stage('Code Analysis') {
-            steps {
-                withSonarQubeEnv('sonarqube-server') {
-                    sh '''$SCANNER_HOME/bin/sonar-scanner \
-                        -Dsonar.projectName=java-web-app \
-                        -Dsonar.java.binaries=. \
-                        -Dsonar.projectKey=java-web-app'''
-                }
-            }
-        }
- stage('docker-stage-clear') {
-          steps {
-              sh 'docker stop $(docker ps -q) || true'
-              sh 'docker rm $(docker ps -aq) || true'
-              sh 'docker rmi $(docker images -q) || true'
-           }
-        }
+//         stage('Code Analysis') {
+//             steps {
+//                 withSonarQubeEnv('sonarqube-server') {
+//                     sh '''$SCANNER_HOME/bin/sonar-scanner \
+//                         -Dsonar.projectName=java-web-app \
+//                         -Dsonar.java.binaries=. \
+//                         -Dsonar.projectKey=java-web-app'''
+//                 }
+//             }
+//         }
+//  stage('docker-stage-clear') {
+//           steps {
+//               sh 'docker stop $(docker ps -q) || true'
+//               sh 'docker rm $(docker ps -aq) || true'
+//               sh 'docker rmi $(docker images -q) || true'
+//            }
+//         }
 
         stage('Build') {
             steps {
@@ -56,15 +64,15 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            echo 'Slack Notification: Build Success'
-            slackSend channel: '#ci-cd-project-jenkins', message: 'Build success', color: 'good'
-        }
-        failure {
-            echo 'Slack Notification: Build Failure'
-            slackSend channel: '#ci-cd-project-jenkins', message: 'Build failed', color: 'danger'
-        }
-    }
+    // post {
+    //     success {
+    //         echo 'Slack Notification: Build Success'
+    //         slackSend channel: '#ci-cd-project-jenkins', message: 'Build success', color: 'good'
+    //     }
+    //     failure {
+    //         echo 'Slack Notification: Build Failure'
+    //         slackSend channel: '#ci-cd-project-jenkins', message: 'Build failed', color: 'danger'
+    //     }
+    // }
 }
 

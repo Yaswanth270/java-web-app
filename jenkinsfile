@@ -3,12 +3,13 @@ pipeline {
     agent any
     tools {
         maven 'maven3'
+        jdk 'java-17'
     }
     triggers {
         // polls the scm every5 mins
         pollSCM ('5 * * * *')
         //builds the piepline periodcally every day 3 clock
-        cron ('0 15 * * *')
+        cron ('0 16 * * *')
     }
    // environment {
      //   SCANNER_HOME = tool 'sonarqube-scanner'
@@ -23,7 +24,7 @@ pipeline {
 
         stage('Compile') {
             steps {
-                sh 'mvn compile'
+                bat 'mvn compile'
             }
         }
 
@@ -47,19 +48,19 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn install'
+                bat 'mvn install'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t java-image-latest .'
+                bat 'docker build -t java-image-latest .'
             }
         }
 
         stage('Run Docker Container') {
             steps {
-                sh 'docker run -itd --name java-container -p 8082:8080 java-image-latest'
+                bat 'docker run -itd --name java-container -p 8082:8080 java-image-latest'
             }
         }
     }

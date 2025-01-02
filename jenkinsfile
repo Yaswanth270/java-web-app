@@ -75,5 +75,4 @@ pipeline {
     //         slackSend channel: '#ci-cd-project-jenkins', message: 'Build failed', color: 'danger'
     //     }
     // }
-}
 

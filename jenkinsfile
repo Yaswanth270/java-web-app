@@ -11,17 +11,17 @@ pipeline {
         //builds the piepline periodcally every day 3 clock
         cron ('0 16 * * *')
     }
-   // environment {
-     //   SCANNER_HOME = tool 'sonarqube-scanner'
-    //}
+//    environment {
+//        SCANNER_HOME = tool 'sonarqube-scanner'
+//     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/Yaswanth270/java-web-app.git'
-            }
-        }
-
+    // stages {
+    //     stage('Checkout') {
+    //         steps {
+    //             git branch: 'main', url: 'https://github.com/Yaswanth270/java-web-app.git'
+    //         }
+    //     }
+    //     }
         stage('Compile') {
             steps {
                 bat 'mvn compile'

@@ -53,7 +53,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh'docker build -t /yaswanth270java-image-latest-1 .'
+                sh'docker build -t yaswanth270/java-image-latest-1 .'
             }
         }
          stage('docker push') {

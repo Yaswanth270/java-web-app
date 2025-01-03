@@ -5,46 +5,46 @@ pipeline {
         maven 'maven3'
         jdk 'java-17'
     }
-    triggers {
-        // polls the scm every5 mins
-        pollSCM ('5 * * * *')
-        //builds the piepline periodcally every day 3 clock
-        cron ('0 16 * * *')
+    // triggers {
+    //     // polls the scm every5 mins
+    //     pollSCM ('5 * * * *')
+    //     //builds the piepline periodcally every day 3 clock
+    //     cron ('0 16 * * *')
+    // }
+   environment {
+       SCANNER_HOME = tool 'sonarqube-scanner'
     }
-//    environment {
-//        SCANNER_HOME = tool 'sonarqube-scanner'
-//     }
 
-    // stages {
-    //     stage('Checkout') {
-    //         steps {
-    //             git branch: 'main', url: 'https://github.com/Yaswanth270/java-web-app.git'
-    //         }
-    //     }
-    //     }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Yaswanth270/java-web-app.git'
+            }
+        }
+        }
         stage('Compile') {
             steps {
                 bat 'mvn compile'
             }
         }
 
-//         stage('Code Analysis') {
-//             steps {
-//                 withSonarQubeEnv('sonarqube-server') {
-//                     sh '''$SCANNER_HOME/bin/sonar-scanner \
-//                         -Dsonar.projectName=java-web-app \
-//                         -Dsonar.java.binaries=. \
-//                         -Dsonar.projectKey=java-web-app'''
-//                 }
-//             }
-//         }
-//  stage('docker-stage-clear') {
-//           steps {
-//               sh 'docker stop $(docker ps -q) || true'
-//               sh 'docker rm $(docker ps -aq) || true'
-//               sh 'docker rmi $(docker images -q) || true'
-//            }
-//         }
+        stage('Code Analysis') {
+            steps {
+                withSonarQubeEnv('sonarqube-server') {
+                    sh '''$SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectName=java-web-app \
+                        -Dsonar.java.binaries=. \
+                        -Dsonar.projectKey=java-web-app'''
+                }
+            }
+        }
+ stage('docker-stage-clear') {
+          steps {
+              sh 'docker stop $(docker ps -q) || true'
+              sh 'docker rm $(docker ps -aq) || true'
+              sh 'docker rmi $(docker images -q) || true'
+           }
+        }
 
         stage('Build') {
             steps {
@@ -54,25 +54,34 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t java-image-latest .'
+                bat 'docker build -t java-image-latest-1 .'
             }
         }
+         stage('docker push') {
+          steps {
+            script {
+              withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                sh 'docker push yaswanth270/java-web'
+                }
+              }
+            }
+          }
 
         stage('Run Docker Container') {
             steps {
-                bat 'docker run -itd --name java-container -p 8082:8080 java-image-latest'
+                bat 'docker run -itd --name java-container -p 8082:8080 java-image-latest-1'
             }
         }
     }
 
-    // post {
-    //     success {
-    //         echo 'Slack Notification: Build Success'
-    //         slackSend channel: '#ci-cd-project-jenkins', message: 'Build success', color: 'good'
-    //     }
-    //     failure {
-    //         echo 'Slack Notification: Build Failure'
-    //         slackSend channel: '#ci-cd-project-jenkins', message: 'Build failed', color: 'danger'
-    //     }
-    // }
+    post {
+        success {
+            echo 'Slack Notification: Build Success'
+            slackSend channel: '#ci-cd-project-jenkins', message: 'Build success', color: 'good'
+        }
+        failure {
+            echo 'Slack Notification: Build Failure'
+            slackSend channel: '#ci-cd-project-jenkins', message: 'Build failed', color: 'danger'
+        }
+    }
 

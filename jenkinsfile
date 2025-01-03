@@ -1,25 +1,16 @@
-
 pipeline {
     agent any
     tools {
         maven 'Maven'
     }
-    // triggers {
-    //     // polls the scm every5 mins
-    //     pollSCM ('5 * * * *')
-    //     //builds the piepline periodcally every day 3 clock
-    //     cron ('0 16 * * *')
-    // }
-   environment {
-       SCANNER_HOME = tool 'sonarqube-scanner'
+    environment {
+        SCANNER_HOME = tool 'sonarqube-scanner'
     }
-
     stages {
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/Yaswanth270/java-web-app.git'
             }
-        }
         }
         stage('Compile') {
             steps {
@@ -37,12 +28,13 @@ pipeline {
                 }
             }
         }
- stage('docker-stage-clear') {
-          steps {
-              sh 'docker stop $(docker ps -q) || true'
-              sh 'docker rm $(docker ps -aq) || true'
-              sh 'docker rmi $(docker images -q) || true'
-           }
+
+        stage('docker-stage-clear') {
+            steps {
+                sh 'docker stop $(docker ps -q) || true'
+                sh 'docker rm $(docker ps -aq) || true'
+                sh 'docker rmi $(docker images -q) || true'
+            }
         }
 
         stage('Build') {
@@ -53,18 +45,19 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh'docker build -t yaswanth270/java-image-latest-1 .'
+                sh 'docker build -t yaswanth270/java-image-latest-1 .'
             }
         }
-         stage('docker push') {
-          steps {
-            script {
-              withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                sh 'docker push yaswanth270/java-image-latest-1'
+
+        stage('docker push') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh 'docker push yaswanth270/java-image-latest-1'
+                    }
                 }
-              }
             }
-          }
+        }
 
         stage('Run Docker Container') {
             steps {
@@ -83,3 +76,4 @@ pipeline {
             slackSend channel: '#ci-cd-project-jenkins', message: 'Build failed', color: 'danger'
         }
     }
+}

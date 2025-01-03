@@ -23,7 +23,7 @@ pipeline {
         }
         stage('Compile') {
             steps {
-                bat 'mvn compile'
+                sh 'mvn compile'
             }
         }
 
@@ -47,20 +47,20 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'mvn install'
+                sh 'mvn install'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t java-image-latest-1 .'
+                sh'docker build -t java-image-latest-1 .'
             }
         }
          stage('docker push') {
           steps {
             script {
               withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                sh 'docker push yaswanth270/java-web'
+                sh 'docker push yaswanth270/java-image-latest-1'
                 }
               }
             }
@@ -68,7 +68,7 @@ pipeline {
 
         stage('Run Docker Container') {
             steps {
-                bat 'docker run -itd --name java-container -p 8082:8080 java-image-latest-1'
+                sh 'docker run -itd --name java-container -p 8082:8080 java-image-latest-1'
             }
         }
     }
@@ -83,4 +83,3 @@ pipeline {
             slackSend channel: '#ci-cd-project-jenkins', message: 'Build failed', color: 'danger'
         }
     }
-

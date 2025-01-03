@@ -2,8 +2,7 @@
 pipeline {
     agent any
     tools {
-        maven 'maven3'
-        jdk 'java-17'
+        maven 'Maven'
     }
     // triggers {
     //     // polls the scm every5 mins

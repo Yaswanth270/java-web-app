@@ -69,11 +69,11 @@ pipeline {
     post {
         success {
             echo 'Slack Notification: Build Success'
-            slackSend channel: '#ci-cd-project-jenkins', message: 'Build success', color: 'good'
+            slackSend channel: '#amd-devops-moni', message: 'Build success', color: 'good'
         }
         failure {
             echo 'Slack Notification: Build Failure'
-            slackSend channel: '#ci-cd-project-jenkins', message: 'Build failed', color: 'danger'
+            slackSend channel: '#amd-devops-moni', message: 'Build failed', color: 'danger'
         }
     }
 }
